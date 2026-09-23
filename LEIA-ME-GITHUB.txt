@@ -1,0 +1,9 @@
+PDVMix — pacote pronto para GitHub Pages
+Domínio: pdvmixapp.com.br
+
+Envie o CONTEÚDO desta pasta para a raiz do repositório (branch main).
+Arquivos principais: index.html, manifest.json, sw.js, CNAME, .nojekyll e pasta assets.
+Não coloque estes arquivos dentro de outra pasta no repositório.
+
+Depois: Settings > Pages > Deploy from a branch > main > /(root).
+Custom domain: pdvmixapp.com.br
