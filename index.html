@@ -435,6 +435,68 @@ nav button>span:last-child{overflow:visible!important;text-overflow:clip!importa
 body.meal-business .tutorial-coach .tc-num{background:#35572B}
 @media(max-width:480px){.tutorial-coach{bottom:calc(101px + var(--safe-bottom));padding:10px}.tutorial-coach .tc-actions{grid-template-columns:1fr}.tutorial-coach p{margin-bottom:8px}}
 
+
+/* ===== v1.14.1 — Modo Estúdio de fotos ===== */
+.photo-editor-overlay{
+  position:fixed;inset:0;z-index:1700;background:rgba(20,17,24,.72);
+  display:flex;align-items:flex-end;justify-content:center
+}
+.photo-editor{
+  width:100%;max-width:640px;max-height:min(94dvh,900px);overflow:auto;
+  background:var(--surface);border-radius:24px 24px 0 0;
+  box-shadow:0 -16px 50px rgba(0,0,0,.22)
+}
+.photo-editor-head{
+  position:sticky;top:0;z-index:2;background:var(--surface);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px;border-bottom:1px solid var(--line)
+}
+.photo-editor-head h2{font-size:18px}
+.photo-editor-body{padding:16px}
+.photo-studio-stage{
+  background:#EEEAE4;border:1px solid var(--line);border-radius:20px;
+  padding:12px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px
+}
+.photo-studio-stage canvas{
+  display:block;width:min(100%,430px);height:auto;aspect-ratio:1/1;
+  border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.12);background:#F7F5F2
+}
+.photo-editor-section{margin-top:14px}
+.photo-editor-section>label{
+  display:block;font-size:10px;font-weight:900;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px
+}
+.photo-choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.photo-choice{
+  min-height:44px;border:1.5px solid var(--line);border-radius:13px;
+  background:var(--surface);color:var(--text);font-size:11px;font-weight:800;padding:8px
+}
+.photo-choice.on{border-color:var(--p);box-shadow:0 0 0 2px color-mix(in srgb,var(--p) 12%,transparent);color:var(--p)}
+.photo-slider-row{
+  display:grid;grid-template-columns:70px 1fr 44px;gap:9px;align-items:center;margin:10px 0
+}
+.photo-slider-row span{font-size:11px;font-weight:800;color:var(--muted)}
+.photo-slider-row output{font-size:10px;text-align:right;color:var(--muted)}
+.photo-slider-row input[type=range]{width:100%;accent-color:var(--p)}
+.photo-editor-foot{
+  position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  display:grid;grid-template-columns:1fr 1fr;gap:10px
+}
+.photo-editor-tip{
+  background:color-mix(in srgb,var(--p) 7%,var(--surface));border-radius:13px;
+  padding:10px 12px;font-size:10.5px;line-height:1.45;color:var(--muted);margin-top:12px
+}
+@media(min-width:700px){
+  .photo-editor-overlay{align-items:center;padding:20px}
+  .photo-editor{border-radius:24px}
+}
+@media(max-width:480px){
+  .photo-choice-grid{grid-template-columns:1fr 1fr}
+  .photo-editor-body{padding:12px}
+}
+
 </style>
 </head>
 <body>
@@ -496,7 +558,7 @@ body.meal-business .tutorial-coach .tc-num{background:#35572B}
 <div id="modals"></div><div id="toastHost"></div>
 
 <script>
-const APP_VERSION='1.14.0';
+const APP_VERSION='1.14.1';
 const TUTORIAL_VERSION='7';
 const TUT_DONE_KEY='pdvmix_tutorial_done_v'+TUTORIAL_VERSION;
 const TUT_STEP_KEY='pdvmix_tutorial_step_v'+TUTORIAL_VERSION;
@@ -691,7 +753,7 @@ async function commitStockMove(id){const p=DB.products.find(x=>x.id===id),type=$
 async function pickProductGalleryDirect(id){const p=DB.products.find(x=>x.id===id);if(!p)return;const input=document.createElement('input');input.type='file';input.accept='image/*';input.onchange=async()=>{const f=input.files?.[0];if(!f)return;await saveProductPhotoFromFile(id,f);renderStock()};input.click()}
 function renderMenu(){ $('screen-cardapio').innerHTML=`<div class="subhead"><div><h1>Cardápio</h1><p>Produtos, preços, custos, combos e categorias.</p></div><div class="fin-actions"><button class="btn gray sm" onclick="openProduct('','combo')">${ic('plus',16)} Combo</button><button class="btn primary sm" onclick="openProduct()">${ic('plus',16)} Produto</button></div></div><div class="modern-note" style="margin-bottom:12px">${ic('money',18)} <span>Combos usam produtos já cadastrados, calculam custo real, desconto e margem antes de salvar. Ao vender um combo, o estoque dos componentes é baixado automaticamente.</span></div><div class="list">${DB.products.filter(p=>!p.archived).map(p=>{const combo=p.category==='combo'&&p.comboItems?.length;return `<div class="row"><div class="r-icon" id="menuimg-${p.id}">${ic(combo?'cart':'store',20)}</div><div class="grow"><b>${esc(p.name)}</b><p>${combo?`Combo • ${comboItemCount(p)} item(ns) • avulso ${money(comboRegularPrice(p))}`:`${esc(catName(p.category))} • Custo ${money(productUnitCost(p))}`}</p>${combo?`<span class="margin-chip">Margem ${comboMargin(p).toFixed(1)}%</span>`:''}</div><div class="right"><strong>${money(p.price)}</strong><button class="btn gray sm" style="margin-top:5px" onclick="openProduct('${p.id}')">Editar</button></div></div>`}).join('')}</div>`;loadAllProductImages()}
 function catName(id){return DB.categories.find(c=>c.id===id)?.name||id}
-function openProduct(id='',presetCategory=''){const base=id?DB.products.find(x=>x.id===id):null,p=base?{...base}:{id:uid(),name:'',category:presetCategory||DB.categories[0]?.id||'acai',price:'',cost:'',stock:0,min:0,unit:'un',active:true,trackStock:true,sku:'',barcode:'',brand:'',supplierId:(isMealMode()&&presetCategory==='marmita'?'__own__':''),location:'',description:'',comboItems:[],comboDiscountType:'percent',comboDiscountValue:10,comboMinMargin:Number(DB.settings.minComboMargin||25)};window._editProduct={...p,comboItems:(p.comboItems||[]).map(x=>({...x})),isNew:!id};showSheet(id?(isMealMode()&&p.category==='marmita'?'Editar marmita':'Editar produto'):(isMealMode()&&p.category==='marmita'?'Nova marmita':'Novo produto'),`<div class="photo-pick"><div id="editPhoto">${ic('camera',28)}<span style="font-size:11px;font-weight:800">Imagem do produto</span></div></div><div class="photo-actions"><button class="btn gray" onclick="pickProductGallery('${p.id}')">${ic('upload',16)} Galeria</button><button class="btn gray" onclick="pickProductCamera('${p.id}')">${ic('camera',16)} Tirar foto</button><button class="btn primary" onclick="reprocessProductImage('${p.id}')">${ic('edit',16)} Ajustar fundo</button><button class="btn danger" onclick="removeProductImage('${p.id}')">${ic('trash',16)} Remover</button></div><div class="photo-ai-note">${ic('camera',16)}<span><b>Padronização automática:</b> a foto é enquadrada inteira, o fundo simples é removido localmente no aparelho e o produto recebe um fundo neutro. Não envia a imagem para a internet.</span></div><div class="field"><label>Nome</label><input class="input" id="pName" value="${esc(p.name)}"></div><div class="grid2"><div class="field"><label>Código / SKU</label><input class="input" id="pSku" value="${esc(p.sku||'')}" placeholder="Ex.: ACAI300"></div><div class="field"><label>Código de barras</label><input class="input" id="pBarcode" value="${esc(p.barcode||'')}" inputmode="numeric" placeholder="Opcional"></div></div><div class="grid2"><div class="field"><label>Categoria</label><select class="input" id="pCat" onchange="toggleProductType()">${DB.categories.map(c=>`<option value="${c.id}" ${p.category===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div><div class="field"><label>Unidade</label><input class="input" id="pUnit" value="${esc(p.unit||'un')}"></div></div><div id="comboBuilder"></div><div id="mealProductExtra"></div><div id="standardProductExtra"><div class="grid2"><div class="field"><label>Marca</label><input class="input" id="pBrand" value="${esc(p.brand||'')}" placeholder="Opcional"></div><div class="field"><label>Origem / fornecedor</label><select class="input" id="pSupplier"><option value="">Sem fornecedor</option>${isMealMode()?`<option value="__own__" ${p.supplierId==='__own__'?'selected':''}>Produção própria</option>`:''}${DB.suppliers.map(s=>`<option value="${s.id}" ${p.supplierId===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select>${isMealMode()?`<div class="source-note"><b>Produção própria</b> = marmita preparada pela própria empresa. Cadastre fornecedores externos em Marmitas → Fornecedores.</div>`:''}</div></div><div class="field"><label>Localização no estoque</label><input class="input" id="pLocation" value="${esc(p.location||'')}" placeholder="Ex.: Freezer 1 / Prateleira B"></div></div><div class="grid2"><div class="field"><label id="pPriceLabel">Preço de venda</label><input class="input" id="pPrice" inputmode="decimal" value="${moneyFieldValue(p.price||0)}"></div><div class="field"><label id="pCostLabel">Custo</label><input class="input" id="pCost" inputmode="decimal" value="${moneyFieldValue(p.cost||0)}"></div></div><div id="stockProductFields" class="grid2"><div class="field"><label>Estoque atual</label><input class="input" id="pStock" type="number" step="0.01" value="${p.stock}"></div><div class="field"><label>Estoque mínimo</label><input class="input" id="pMin" type="number" step="0.01" value="${p.min}"></div></div><div class="field"><label>Descrição / observações do produto</label><textarea class="input" id="pDescription" rows="3" placeholder="Ingredientes, sabor, tamanho, observações...">${esc(p.description||'')}</textarea></div><div class="grid2"><label class="check-line"><input id="pActive" type="checkbox" ${p.active!==false?'checked':''}> Disponível para venda</label><label class="check-line"><input id="pTrackStock" type="checkbox" ${p.trackStock!==false?'checked':''}> Controlar estoque</label></div>${id?`<button class="btn danger block" onclick="deleteProduct('${p.id}')">${ic('trash',16)} Excluir produto</button>`:''}`,`<button class="btn gray" onclick="closeSheet()">Cancelar</button><button class="btn green" onclick="saveProduct()">Salvar</button>`);idbGet('product:'+p.id).then(img=>{if(img){const e=$('editPhoto');if(e)e.innerHTML=`<img src="${img}">`}}).catch(()=>{});setTimeout(toggleProductType,0)}
+function openProduct(id='',presetCategory=''){const base=id?DB.products.find(x=>x.id===id):null,p=base?{...base}:{id:uid(),name:'',category:presetCategory||DB.categories[0]?.id||'acai',price:'',cost:'',stock:0,min:0,unit:'un',active:true,trackStock:true,sku:'',barcode:'',brand:'',supplierId:(isMealMode()&&presetCategory==='marmita'?'__own__':''),location:'',description:'',comboItems:[],comboDiscountType:'percent',comboDiscountValue:10,comboMinMargin:Number(DB.settings.minComboMargin||25)};window._editProduct={...p,comboItems:(p.comboItems||[]).map(x=>({...x})),isNew:!id};showSheet(id?(isMealMode()&&p.category==='marmita'?'Editar marmita':'Editar produto'):(isMealMode()&&p.category==='marmita'?'Nova marmita':'Novo produto'),`<div class="photo-pick"><div id="editPhoto">${ic('camera',28)}<span style="font-size:11px;font-weight:800">Imagem do produto</span></div></div><div class="photo-actions"><button class="btn gray" onclick="pickProductGallery('${p.id}')">${ic('upload',16)} Galeria</button><button class="btn gray" onclick="pickProductCamera('${p.id}')">${ic('camera',16)} Tirar foto</button><button class="btn primary" onclick="openProductPhotoEditor('${p.id}')">${ic('edit',16)} Ajustar imagem</button><button class="btn danger" onclick="removeProductImage('${p.id}')">${ic('trash',16)} Remover</button></div><div class="photo-ai-note">${ic('camera',16)}<span><b>Modo Estúdio:</b> o PDVMix não tenta mais apagar o fundo automaticamente. A foto inteira é preservada e você pode ajustar enquadramento, zoom, posição e escolher fundo neutro, branco ou desfocado.</span></div><div class="field"><label>Nome</label><input class="input" id="pName" value="${esc(p.name)}"></div><div class="grid2"><div class="field"><label>Código / SKU</label><input class="input" id="pSku" value="${esc(p.sku||'')}" placeholder="Ex.: ACAI300"></div><div class="field"><label>Código de barras</label><input class="input" id="pBarcode" value="${esc(p.barcode||'')}" inputmode="numeric" placeholder="Opcional"></div></div><div class="grid2"><div class="field"><label>Categoria</label><select class="input" id="pCat" onchange="toggleProductType()">${DB.categories.map(c=>`<option value="${c.id}" ${p.category===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div><div class="field"><label>Unidade</label><input class="input" id="pUnit" value="${esc(p.unit||'un')}"></div></div><div id="comboBuilder"></div><div id="mealProductExtra"></div><div id="standardProductExtra"><div class="grid2"><div class="field"><label>Marca</label><input class="input" id="pBrand" value="${esc(p.brand||'')}" placeholder="Opcional"></div><div class="field"><label>Origem / fornecedor</label><select class="input" id="pSupplier"><option value="">Sem fornecedor</option>${isMealMode()?`<option value="__own__" ${p.supplierId==='__own__'?'selected':''}>Produção própria</option>`:''}${DB.suppliers.map(s=>`<option value="${s.id}" ${p.supplierId===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select>${isMealMode()?`<div class="source-note"><b>Produção própria</b> = marmita preparada pela própria empresa. Cadastre fornecedores externos em Marmitas → Fornecedores.</div>`:''}</div></div><div class="field"><label>Localização no estoque</label><input class="input" id="pLocation" value="${esc(p.location||'')}" placeholder="Ex.: Freezer 1 / Prateleira B"></div></div><div class="grid2"><div class="field"><label id="pPriceLabel">Preço de venda</label><input class="input" id="pPrice" inputmode="decimal" value="${moneyFieldValue(p.price||0)}"></div><div class="field"><label id="pCostLabel">Custo</label><input class="input" id="pCost" inputmode="decimal" value="${moneyFieldValue(p.cost||0)}"></div></div><div id="stockProductFields" class="grid2"><div class="field"><label>Estoque atual</label><input class="input" id="pStock" type="number" step="0.01" value="${p.stock}"></div><div class="field"><label>Estoque mínimo</label><input class="input" id="pMin" type="number" step="0.01" value="${p.min}"></div></div><div class="field"><label>Descrição / observações do produto</label><textarea class="input" id="pDescription" rows="3" placeholder="Ingredientes, sabor, tamanho, observações...">${esc(p.description||'')}</textarea></div><div class="grid2"><label class="check-line"><input id="pActive" type="checkbox" ${p.active!==false?'checked':''}> Disponível para venda</label><label class="check-line"><input id="pTrackStock" type="checkbox" ${p.trackStock!==false?'checked':''}> Controlar estoque</label></div>${id?`<button class="btn danger block" onclick="deleteProduct('${p.id}')">${ic('trash',16)} Excluir produto</button>`:''}`,`<button class="btn gray" onclick="closeSheet()">Cancelar</button><button class="btn green" onclick="saveProduct()">Salvar</button>`);idbGet('product:'+p.id).then(img=>{if(img){const e=$('editPhoto');if(e)e.innerHTML=`<img src="${img}">`}}).catch(()=>{});setTimeout(toggleProductType,0)}
 function toggleProductType(){const cat=$('pCat')?.value,isCombo=cat==='combo',isMeal=cat==='marmita',h=$('comboBuilder'),mh=$('mealProductExtra'),st=$('stockProductFields'),extra=$('standardProductExtra'),track=$('pTrackStock'),price=$('pPrice'),cost=$('pCost'),unit=$('pUnit');if(st)st.style.display=isCombo?'none':'grid';if(extra)extra.style.display=isCombo?'none':'block';if(track){track.disabled=isCombo;if(isCombo)track.checked=false}if(price)price.readOnly=isCombo;if(cost)cost.readOnly=isCombo;if(unit&&isCombo)unit.value='combo';if(isMealMode()&&isMeal){if($('pPriceLabel'))$('pPriceLabel').textContent='Preço por marmita';if($('pCostLabel'))$('pCostLabel').textContent='Custo unitário total';if(unit&&!unit.value)unit.value='un'}else{if($('pPriceLabel'))$('pPriceLabel').textContent='Preço de venda';if($('pCostLabel'))$('pCostLabel').textContent='Custo'}if(h){if(isCombo)renderComboBuilder();else h.innerHTML=''}if(mh){if(isMeal)renderMealProductExtra();else mh.innerHTML=''}setupMoneyField('pPrice');setupMoneyField('pCost');if(isMealMode()&&isMeal)setTimeout(updateMealProductEconomics,0)}
 function calcMealProductCost(force=true){const ids=['mealCostIngredients','mealCostPackaging','mealCostLabor','mealCostOther'];if(!ids.some(id=>$(id)))return;const total=ids.reduce((a,id)=>a+parseMoneyInput($(id)?.value||0),0),cost=$('pCost');if(force&&cost&&total>0){cost.value=moneyFieldValue(total)}updateMealProductEconomics()}
 function updateMealProductEconomics(){const h=$('mealEconPreview');if(!h)return;const price=parseMoneyInput($('pPrice')?.value||0),cost=parseMoneyInput($('pCost')?.value||0),profit=price-cost,margin=price>0?profit/price*100:0;h.innerHTML=`<div><small>Custo total</small><b>${money(cost)}</b></div><div><small>Lucro unitário</small><b style="color:${profit>=0?'#3F7531':'#B7463E'}">${money(profit)}</b></div><div><small>Margem</small><b>${margin.toFixed(1).replace('.',',')}%</b></div>`}
@@ -702,25 +764,188 @@ function comboRecalc(){const checks=[...document.querySelectorAll('.combo-check:
 function dataUrlFromFile(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(r.error||new Error('Falha ao ler imagem'));r.readAsDataURL(file)})}
 function imageFromDataUrl(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Imagem inválida'));im.src=src})}
 function colorDistanceSq(r,g,b,bg){const dr=r-bg[0],dg=g-bg[1],db=b-bg[2];return dr*dr+dg*dg+db*db}
-async function standardizeProductPhoto(src){const img=await imageFromDataUrl(src),maxWork=820,scale=Math.min(1,maxWork/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height)),w=Math.max(1,Math.round((img.naturalWidth||img.width)*scale)),h=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,w,h);let d=x.getImageData(0,0,w,h),px=d.data;
- // Cor de fundo estimada por amostras das bordas/cantos.
- const samples=[],step=Math.max(1,Math.floor(Math.min(w,h)/40));for(let xx=0;xx<w;xx+=step){for(const yy of [0,Math.max(0,h-1)]){const i=(yy*w+xx)*4;if(px[i+3]>20)samples.push([px[i],px[i+1],px[i+2]])}}for(let yy=0;yy<h;yy+=step){for(const xx of [0,Math.max(0,w-1)]){const i=(yy*w+xx)*4;if(px[i+3]>20)samples.push([px[i],px[i+1],px[i+2]])}}
- const bg=samples.length?[0,1,2].map(k=>Math.round(samples.reduce((a,v)=>a+v[k],0)/samples.length)):[250,250,250];const tol=58,tol2=tol*tol,seen=new Uint8Array(w*h),queue=new Int32Array(w*h),mask=new Uint8Array(w*h);let qh=0,qt=0;
- const seed=(idx)=>{if(seen[idx])return;const i=idx*4;if(px[i+3]<30||colorDistanceSq(px[i],px[i+1],px[i+2],bg)<=tol2){seen[idx]=1;queue[qt++]=idx}};for(let xx=0;xx<w;xx++){seed(xx);seed((h-1)*w+xx)}for(let yy=0;yy<h;yy++){seed(yy*w);seed(yy*w+w-1)}
- while(qh<qt){const idx=queue[qh++],yy=Math.floor(idx/w),xx=idx-yy*w;mask[idx]=1;const ns=[idx-1,idx+1,idx-w,idx+w];for(const n of ns){if(n<0||n>=w*h||seen[n])continue;const ny=Math.floor(n/w),nx=n-ny*w;if(Math.abs(nx-xx)+Math.abs(ny-yy)!==1)continue;const i=n*4;if(px[i+3]<30||colorDistanceSq(px[i],px[i+1],px[i+2],bg)<=tol2){seen[n]=1;queue[qt++]=n}}}
- let removed=0,minX=w,minY=h,maxX=-1,maxY=-1;for(let i=0;i<w*h;i++){if(mask[i]){removed++;px[i*4+3]=0}else if(px[i*4+3]>20){const yy=Math.floor(i/w),xx=i-yy*w;if(xx<minX)minX=xx;if(xx>maxX)maxX=xx;if(yy<minY)minY=yy;if(yy>maxY)maxY=yy}}
- const ratio=removed/(w*h),usable=maxX>=minX&&maxY>=minY&&ratio>.04&&ratio<.92;const out=document.createElement('canvas'),S=900;out.width=S;out.height=S;const o=out.getContext('2d');o.fillStyle=isMealMode()?'#F6F2E8':'#F7F4F8';o.fillRect(0,0,S,S);if(usable){x.putImageData(d,0,0);const sw=maxX-minX+1,sh=maxY-minY+1,pad=58,fit=Math.min((S-pad*2)/sw,(S-pad*2)/sh),dw=Math.max(1,Math.round(sw*fit)),dh=Math.max(1,Math.round(sh*fit));o.drawImage(c,minX,minY,sw,sh,Math.round((S-dw)/2),Math.round((S-dh)/2),dw,dh)}else{const pad=52,fit=Math.min((S-pad*2)/(img.naturalWidth||img.width),(S-pad*2)/(img.naturalHeight||img.height)),dw=Math.round((img.naturalWidth||img.width)*fit),dh=Math.round((img.naturalHeight||img.height)*fit);o.drawImage(img,Math.round((S-dw)/2),Math.round((S-dh)/2),dw,dh)}return out.toDataURL('image/jpeg',.9)}
-async function saveProductPhotoFromFile(id,file){if(!file)return;if(file.size>8*1024*1024){toast('Use imagem de até 8 MB.');return}toast('Ajustando a imagem do produto...');try{const original=await dataUrlFromFile(file);await idbPut('product-original:'+id,original);const ready=await standardizeProductPhoto(original);await idbPut('product:'+id,ready);const e=$('editPhoto');if(e)e.innerHTML=`<img src="${ready}" alt="Imagem do produto">`;toast('Imagem padronizada: produto inteiro e fundo neutro.')}catch(e){console.error(e);toast('Não foi possível ajustar a foto. Tente outra imagem.')}}
+
+/* v1.14.1 — Modo Estúdio.
+   Não faz remoção automática de fundo. Isso evita artefatos e partes apagadas
+   do produto. Em vez disso, preserva a foto original e cria um quadro quadrado
+   controlável pelo usuário. */
+async function frameProductPhoto(src,opts={}){
+  const img=await imageFromDataUrl(src),S=900,out=document.createElement('canvas');
+  out.width=S;out.height=S;
+  const ctx=out.getContext('2d');
+  const mode=opts.mode||'contain';
+  const bg=opts.bg||'neutral';
+  const zoom=Math.max(.5,Math.min(2.2,Number(opts.zoom||1)));
+  const ox=Math.max(-100,Math.min(100,Number(opts.x||0)));
+  const oy=Math.max(-100,Math.min(100,Number(opts.y||0)));
+  const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+
+  if(bg==='blur'){
+    ctx.save();
+    ctx.filter='blur(32px) saturate(.85) brightness(1.06)';
+    const bs=Math.max(S/iw,S/ih),bw=iw*bs,bh=ih*bs;
+    ctx.drawImage(img,(S-bw)/2-20,(S-bh)/2-20,bw+40,bh+40);
+    ctx.restore();
+    ctx.fillStyle='rgba(255,255,255,.20)';
+    ctx.fillRect(0,0,S,S);
+  }else{
+    ctx.fillStyle=bg==='white'?'#FFFFFF':(isMealMode()?'#F6F2E8':'#F7F5F2');
+    ctx.fillRect(0,0,S,S);
+  }
+
+  const base=(mode==='cover'?Math.max(S/iw,S/ih):Math.min((S-80)/iw,(S-80)/ih));
+  const sc=base*zoom,dw=iw*sc,dh=ih*sc;
+  const dx=(S-dw)/2+(ox/100)*S*.38;
+  const dy=(S-dh)/2+(oy/100)*S*.38;
+  ctx.drawImage(img,dx,dy,dw,dh);
+
+  return out.toDataURL('image/jpeg',.92);
+}
+
+async function standardizeProductPhoto(src){
+  return frameProductPhoto(src,{mode:'contain',bg:'neutral',zoom:1,x:0,y:0});
+}
+
+function closeProductPhotoEditor(){
+  const el=document.getElementById('photoEditorOverlay');
+  if(el)el.remove();
+  window._photoStudio=null;
+}
+
+function photoStudioSet(key,value){
+  if(!window._photoStudio)return;
+  window._photoStudio.opts[key]=value;
+  document.querySelectorAll(`[data-photo-key="${key}"]`).forEach(b=>b.classList.toggle('on',String(b.dataset.photoValue)===String(value)));
+  renderProductPhotoStudio();
+}
+
+function photoStudioRange(key,value){
+  if(!window._photoStudio)return;
+  window._photoStudio.opts[key]=Number(value);
+  const out=document.getElementById('photo-'+key+'-out');
+  if(out)out.textContent=(key==='zoom'?Math.round(Number(value)*100)+'%':String(value));
+  renderProductPhotoStudio();
+}
+
+function resetProductPhotoStudio(){
+  if(!window._photoStudio)return;
+  window._photoStudio.opts={mode:'contain',bg:'neutral',zoom:1,x:0,y:0};
+  ['zoom','x','y'].forEach(k=>{
+    const el=document.getElementById('photo-'+k);
+    if(el)el.value=window._photoStudio.opts[k];
+    const out=document.getElementById('photo-'+k+'-out');
+    if(out)out.textContent=k==='zoom'?'100%':'0';
+  });
+  document.querySelectorAll('[data-photo-key]').forEach(b=>{
+    b.classList.toggle('on',String(b.dataset.photoValue)===String(window._photoStudio.opts[b.dataset.photoKey]));
+  });
+  renderProductPhotoStudio();
+}
+
+async function renderProductPhotoStudio(){
+  const st=window._photoStudio;
+  if(!st||!st.img)return;
+  const canvas=document.getElementById('photoStudioCanvas');
+  if(!canvas)return;
+  const S=900;canvas.width=S;canvas.height=S;
+  const ctx=canvas.getContext('2d'),img=st.img,o=st.opts;
+  const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+
+  if(o.bg==='blur'){
+    ctx.save();ctx.filter='blur(32px) saturate(.85) brightness(1.06)';
+    const bs=Math.max(S/iw,S/ih),bw=iw*bs,bh=ih*bs;
+    ctx.drawImage(img,(S-bw)/2-20,(S-bh)/2-20,bw+40,bh+40);
+    ctx.restore();ctx.fillStyle='rgba(255,255,255,.20)';ctx.fillRect(0,0,S,S);
+  }else{
+    ctx.fillStyle=o.bg==='white'?'#FFFFFF':(isMealMode()?'#F6F2E8':'#F7F5F2');
+    ctx.fillRect(0,0,S,S);
+  }
+
+  const base=(o.mode==='cover'?Math.max(S/iw,S/ih):Math.min((S-80)/iw,(S-80)/ih));
+  const sc=base*o.zoom,dw=iw*sc,dh=ih*sc;
+  const dx=(S-dw)/2+(o.x/100)*S*.38,dy=(S-dh)/2+(o.y/100)*S*.38;
+  ctx.drawImage(img,dx,dy,dw,dh);
+}
+
+async function openProductPhotoEditor(id){
+  try{
+    const original=await idbGet('product-original:'+id)||await idbGet('product:'+id);
+    if(!original){toast('Adicione uma foto primeiro.');return}
+    const img=await imageFromDataUrl(original);
+    const old=document.getElementById('photoEditorOverlay');if(old)old.remove();
+    const wrap=document.createElement('div');wrap.id='photoEditorOverlay';wrap.className='photo-editor-overlay';
+    wrap.innerHTML=`<div class="photo-editor" role="dialog" aria-modal="true">
+      <div class="photo-editor-head"><h2>Estúdio da imagem</h2><button class="x" onclick="closeProductPhotoEditor()">✕</button></div>
+      <div class="photo-editor-body">
+        <div class="photo-studio-stage"><canvas id="photoStudioCanvas" width="900" height="900"></canvas></div>
+
+        <div class="photo-editor-section"><label>Enquadramento</label>
+          <div class="photo-choice-grid">
+            <button class="photo-choice on" data-photo-key="mode" data-photo-value="contain" onclick="photoStudioSet('mode','contain')">Imagem inteira</button>
+            <button class="photo-choice" data-photo-key="mode" data-photo-value="cover" onclick="photoStudioSet('mode','cover')">Preencher quadro</button>
+          </div>
+        </div>
+
+        <div class="photo-editor-section"><label>Fundo do quadro</label>
+          <div class="photo-choice-grid">
+            <button class="photo-choice on" data-photo-key="bg" data-photo-value="neutral" onclick="photoStudioSet('bg','neutral')">Neutro</button>
+            <button class="photo-choice" data-photo-key="bg" data-photo-value="white" onclick="photoStudioSet('bg','white')">Branco</button>
+            <button class="photo-choice" data-photo-key="bg" data-photo-value="blur" onclick="photoStudioSet('bg','blur')">Foto desfocada</button>
+          </div>
+        </div>
+
+        <div class="photo-editor-section"><label>Ajustes</label>
+          <div class="photo-slider-row"><span>Zoom</span><input id="photo-zoom" type="range" min=".6" max="2" step=".02" value="1" oninput="photoStudioRange('zoom',this.value)"><output id="photo-zoom-out">100%</output></div>
+          <div class="photo-slider-row"><span>Horizontal</span><input id="photo-x" type="range" min="-100" max="100" step="1" value="0" oninput="photoStudioRange('x',this.value)"><output id="photo-x-out">0</output></div>
+          <div class="photo-slider-row"><span>Vertical</span><input id="photo-y" type="range" min="-100" max="100" step="1" value="0" oninput="photoStudioRange('y',this.value)"><output id="photo-y-out">0</output></div>
+        </div>
+
+        <div class="photo-editor-tip"><b>Por que mudou?</b> Remover o fundo automaticamente no próprio navegador pode apagar partes do produto, como aconteceu na sua foto. Este modo mantém a imagem original intacta e deixa o enquadramento sob seu controle.</div>
+        <button class="btn gray block" style="margin-top:12px" onclick="resetProductPhotoStudio()">Restaurar enquadramento</button>
+      </div>
+      <div class="photo-editor-foot"><button class="btn gray" onclick="closeProductPhotoEditor()">Cancelar</button><button class="btn green" onclick="saveProductPhotoStudio('${id}')">Usar esta imagem</button></div>
+    </div>`;
+    document.body.appendChild(wrap);
+    window._photoStudio={id,original,img,opts:{mode:'contain',bg:'neutral',zoom:1,x:0,y:0}};
+    renderProductPhotoStudio();
+  }catch(e){console.error(e);toast('Não foi possível abrir o editor da imagem.')}
+}
+
+async function saveProductPhotoStudio(id){
+  const st=window._photoStudio;if(!st||st.id!==id)return;
+  const canvas=document.getElementById('photoStudioCanvas');if(!canvas)return;
+  const ready=canvas.toDataURL('image/jpeg',.92);
+  await idbPut('product:'+id,ready);
+  await idbPut('product-photo-settings:'+id,{...st.opts});
+  const e=$('editPhoto');if(e)e.innerHTML=`<img src="${ready}" alt="Imagem do produto">`;
+  closeProductPhotoEditor();
+  toast('Imagem ajustada e salva.');
+}
+
+async function saveProductPhotoFromFile(id,file){
+  if(!file)return;
+  if(file.size>8*1024*1024){toast('Use imagem de até 8 MB.');return}
+  toast('Preparando a imagem...');
+  try{
+    const original=await dataUrlFromFile(file);
+    await idbPut('product-original:'+id,original);
+    const ready=await standardizeProductPhoto(original);
+    await idbPut('product:'+id,ready);
+    await idbPut('product-photo-settings:'+id,{mode:'contain',bg:'neutral',zoom:1,x:0,y:0});
+    const e=$('editPhoto');if(e)e.innerHTML=`<img src="${ready}" alt="Imagem do produto">`;
+    toast('Foto salva inteira. Use “Ajustar imagem” se quiser reposicionar ou mudar o fundo do quadro.');
+  }catch(e){console.error(e);toast('Não foi possível preparar a foto. Tente outra imagem.')}
+}
 function productImageInput(id,camera=false){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';if(camera)inp.capture='environment';inp.onchange=async()=>{const f=inp.files?.[0];if(!f)return;await saveProductPhotoFromFile(id,f)};inp.click()}
 function pickProductGallery(id){productImageInput(id,false)}
 function pickProductCamera(id){productImageInput(id,true)}
-async function reprocessProductImage(id){try{const original=await idbGet('product-original:'+id)||await idbGet('product:'+id);if(!original){toast('Adicione uma foto primeiro.');return}toast('Reajustando fundo e enquadramento...');const ready=await standardizeProductPhoto(original);await idbPut('product:'+id,ready);const e=$('editPhoto');if(e)e.innerHTML=`<img src="${ready}" alt="Imagem do produto">`;toast('Imagem reajustada.')}catch(e){console.error(e);toast('Não foi possível reajustar esta imagem.')}}
-async function removeProductImage(id){await idbDel('product:'+id).catch(()=>{});await idbDel('product-original:'+id).catch(()=>{});const e=$('editPhoto');if(e)e.innerHTML=`${ic('camera',28)}<span style="font-size:11px;font-weight:800">Imagem do produto</span>`;toast('Imagem removida.')}
+async function reprocessProductImage(id){return openProductPhotoEditor(id)}
+async function removeProductImage(id){await idbDel('product:'+id).catch(()=>{});await idbDel('product-original:'+id).catch(()=>{});await idbDel('product-photo-settings:'+id).catch(()=>{});const e=$('editPhoto');if(e)e.innerHTML=`${ic('camera',28)}<span style="font-size:11px;font-weight:800">Imagem do produto</span>`;toast('Imagem removida.')}
 async function saveProduct(){const w=window._editProduct,name=$('pName').value.trim(),price=parseMoneyInput($('pPrice').value),cost=parseMoneyInput($('pCost').value),isCombo=$('pCat').value==='combo';if(!name||!isFinite(price)||price<0){toast('Informe nome e preço válido.');return}const common={name,sku:$('pSku')?.value.trim()||'',barcode:$('pBarcode')?.value.trim()||'',brand:$('pBrand')?.value.trim()||'',supplierId:$('pSupplier')?.value||'',location:$('pLocation')?.value.trim()||'',description:$('pDescription')?.value.trim()||'',active:$('pActive')?$('pActive').checked:true,mealWeightG:Number($('mealWeightG')?.value||0),mealLine:$('mealLine')?.value||'',mealShelfLifeDays:Number($('mealShelfLifeDays')?.value||0),mealTags:$('mealTags')?.value.trim()||'',mealCostIngredients:parseMoneyInput($('mealCostIngredients')?.value||0),mealCostPackaging:parseMoneyInput($('mealCostPackaging')?.value||0),mealCostLabor:parseMoneyInput($('mealCostLabor')?.value||0),mealCostOther:parseMoneyInput($('mealCostOther')?.value||0)};if(isCombo){comboRecalc();const totalItems=(w.comboItems||[]).reduce((a,x)=>a+Number(x.qty||0),0);if(totalItems<2){toast('Selecione pelo menos 2 itens para montar o combo.');return}w.comboDiscountType=$('comboDiscountType').value;w.comboDiscountValue=Math.max(0,w.comboDiscountType==='percent'?parsePercentInput($('comboDiscountValue').value||0):parseMoneyInput($('comboDiscountValue').value||0));w.comboMinMargin=Math.max(0,parsePercentInput($('comboMinMargin').value||0));Object.assign(w,common,{category:'combo',unit:'combo',price:parseMoneyInput($('pPrice').value||0),cost:parseMoneyInput($('pCost').value||0),stock:0,min:0,trackStock:false})}else{const stock=Number($('pStock').value),min=Number($('pMin').value);Object.assign(w,common,{category:$('pCat').value,unit:$('pUnit').value.trim()||'un',price,cost:isFinite(cost)?cost:0,stock:isFinite(stock)?stock:0,min:isFinite(min)?min:0,trackStock:$('pTrackStock')?$('pTrackStock').checked:true,comboItems:[]})}delete w.isNew;const ix=DB.products.findIndex(x=>x.id===w.id);if(ix>=0)DB.products[ix]=w;else DB.products.push(w);await persistDB();closeSheet();toast(isCombo?'Combo salvo.':(isMealMode()&&w.category==='marmita'?'Marmita salva.':'Produto salvo.'));if(currentTab==='estoque')renderStock();else if(currentTab==='cardapio')renderMenu();else if(currentTab==='pdv')renderPDV();else renderDashboard()}
 async function deleteProduct(id){const p=DB.products.find(x=>x.id===id);if(!p)return;const dependents=DB.products.filter(x=>!x.archived&&x.category==='combo'&&x.comboItems?.some(i=>i.productId===id));const sold=DB.sales.some(s=>s.items.some(i=>i.productId===id));let msg=`Excluir "${p.name}" do PDVMix?`;
 if(sold)msg+='\n\nComo o produto possui histórico de vendas, ele será arquivado e desaparecerá do estoque, cardápio e PDV, mas continuará preservado nos relatórios antigos.';
 if(dependents.length)msg+=`\n\nEle participa de ${dependents.length} combo(s): ${dependents.map(x=>x.name).join(', ')}. Esses combos também serão arquivados para evitar vendas com composição inválida.`;
-if(!confirm(msg))return;const now=new Date().toISOString();if(sold){Object.assign(p,{active:false,archived:true,archivedAt:now,trackStock:false})}else{DB.products=DB.products.filter(x=>x.id!==id)}for(const c of dependents)Object.assign(c,{active:false,archived:true,archivedAt:now});await idbDel('product:'+id).catch(()=>{});await persistDB();closeSheet();toast(sold?'Produto arquivado e removido das telas de venda.':'Produto excluído.');if(currentTab==='estoque')renderStock();else if(currentTab==='cardapio')renderMenu();else if(currentTab==='pdv')renderPDV();else renderDashboard()}
+if(!confirm(msg))return;const now=new Date().toISOString();if(sold){Object.assign(p,{active:false,archived:true,archivedAt:now,trackStock:false})}else{DB.products=DB.products.filter(x=>x.id!==id)}for(const c of dependents)Object.assign(c,{active:false,archived:true,archivedAt:now});await idbDel('product:'+id).catch(()=>{});await idbDel('product-original:'+id).catch(()=>{});await idbDel('product-photo-settings:'+id).catch(()=>{});await persistDB();closeSheet();toast(sold?'Produto arquivado e removido das telas de venda.':'Produto excluído.');if(currentTab==='estoque')renderStock();else if(currentTab==='cardapio')renderMenu();else if(currentTab==='pdv')renderPDV();else renderDashboard()}
 async function loadAllProductImages(){for(const p of DB.products){const img=await idbGet('product:'+p.id).catch(()=>null);if(!img)continue;['thumb-','rowimg-','menuimg-'].forEach(pre=>{const e=$(pre+p.id);if(e)e.innerHTML=`<img src="${img}">`})}}
 function periodStart(period){const now=new Date(),start=new Date(now);if(period==='today')return today();if(period==='week')start.setDate(now.getDate()-6);else if(period==='month')start.setDate(1);else if(period==='year'){start.setMonth(0,1)}start.setHours(0,0,0,0);return ymd(start)}
 function periodSales(period){const si=periodStart(period);return DB.sales.filter(s=>ymd(s.date)>=si)}
