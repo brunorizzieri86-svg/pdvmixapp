@@ -1,4 +1,4 @@
-const CACHE = 'pdvmix-v1.7.0';
+const CACHE = 'pdvmix-v1.13.0';
 const CORE = [
   './', './index.html', './manifest.json',
   './assets/pdvmix-logo.png',
