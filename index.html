@@ -414,7 +414,7 @@ body.meal-business nav button.on>span:last-child{color:#35572B}
 <div id="modals"></div><div id="toastHost"></div>
 
 <script>
-const APP_VERSION='1.13.0';
+const APP_VERSION='1.13.1';
 const TUTORIAL_VERSION='7';
 const TUT_DONE_KEY='pdvmix_tutorial_done_v'+TUTORIAL_VERSION;
 const TUT_STEP_KEY='pdvmix_tutorial_step_v'+TUTORIAL_VERSION;
@@ -846,7 +846,7 @@ function showSheet(title,body,foot=''){ $('modals').innerHTML=`<div class="modal
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e});function installPWA(){if(matchMedia('(display-mode: standalone)').matches){toast('O PDVMix já está instalado.');return}if(deferredInstallPrompt){deferredInstallPrompt.prompt();deferredInstallPrompt.userChoice.finally(()=>deferredInstallPrompt=null)}else toast('No navegador, use “Instalar app” ou “Adicionar à tela inicial”.')}
 function updateOnline(){document.body.classList.toggle('offline',!navigator.onLine)}window.addEventListener('online',updateOnline);window.addEventListener('offline',updateOnline);updateOnline();
 window.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{$('splash').classList.add('hidden');showAuth()},650)});
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+if('serviceWorker' in navigator){window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('sw.js',{updateViaCache:'none'});await reg.update();}catch(e){}})}
 
 document.addEventListener('focusin',e=>{if(window.innerWidth<=700&&e.target?.matches?.('input,select,textarea'))setTimeout(()=>{try{e.target.scrollIntoView({behavior:'smooth',block:'center'})}catch(x){}},280)});
 </script>

@@ -1,4 +1,4 @@
-const CACHE = 'pdvmix-v1.13.0';
+const CACHE = 'pdvmix-v1.13.1';
 const CORE = [
   './', './index.html', './manifest.json',
   './assets/pdvmix-logo.png',
@@ -12,11 +12,24 @@ self.addEventListener('activate', event => {
 });
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  const req = event.request;
+  const url = new URL(req.url);
+  const isNavigation = req.mode === 'navigate' || url.pathname.endsWith('/index.html') || url.pathname === '/' || url.pathname.endsWith('/manifest.json');
+  if (isNavigation) {
+    event.respondWith(
+      fetch(req, {cache:'no-store'}).then(response => {
+        const copy = response.clone();
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(()=>{});
+        return response;
+      }).catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
+    );
+    return;
+  }
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+    caches.match(req).then(cached => cached || fetch(req).then(response => {
       const copy = response.clone();
-      caches.open(CACHE).then(c => c.put(event.request, copy)).catch(()=>{});
+      caches.open(CACHE).then(c => c.put(req, copy)).catch(()=>{});
       return response;
-    }).catch(() => caches.match('./index.html')))
+    }))
   );
 });

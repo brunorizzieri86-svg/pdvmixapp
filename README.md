@@ -1,3 +1,13 @@
+# PDVMix PWA v1.13.1
+
+Correção de atualização/cache do GitHub Pages.
+
+- Mantém os módulos Açaí e Marmitas.
+- `index.html` e navegações passam a priorizar a versão de rede quando online.
+- Service Worker atualizado com `updateViaCache: none`.
+- Incluído `atualizar.html` para limpar Service Worker/cache antigo em caso de emergência.
+- Cache: `pdvmix-v1.13.1`.
+
 # PDVMix PWA v1.13.0
 
 ## Navegação
