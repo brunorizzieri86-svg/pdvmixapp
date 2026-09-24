@@ -1,4 +1,4 @@
-# PDVMix PWA v1.6.0
+# PDVMix PWA v1.7.0
 
 ## Compatibilidade responsiva
 Esta versão foi adaptada para **Desktop/Notebook, Tablet, iPhone e Android**, mantendo o núcleo **PWA offline-first**.
@@ -67,7 +67,7 @@ O módulo Financeiro é gerencial. Emissão de NFC-e/NF-e, SAT/MFE, SPED, apura�
 - Filtros de estoque: todos, baixo, zerado e combos, com valor estimado do estoque.
 
 
-## Tutorial guiado v1.6.0
+## Tutorial guiado v1.7.0
 
 - Tutorial completo embutido com progresso salvo no aparelho.
 - Abertura automática uma única vez para novos/atuais usuários após a atualização.
@@ -79,3 +79,18 @@ O módulo Financeiro é gerencial. Emissão de NFC-e/NF-e, SAT/MFE, SPED, apura�
 ## Publicação
 
 Pacote preparado para GitHub Pages com domínio `pdvmixapp.com.br` (`CNAME` + `.nojekyll`).
+
+
+## Novidades da versão 1.7.0 — Self-service por peso
+
+- Venda por peso integrada ao mesmo pedido dos produtos normais.
+- Múltiplas modalidades configuráveis (ex.: Açaí self-service e Sorvete self-service).
+- Preço por kg, custo por kg e tara padrão independentes por modalidade.
+- Cálculo: `(peso bruto - tara) / 1000 x preço por kg`, arredondado ao centavo.
+- Atalho para usar tara 0 quando a balança já foi zerada com o recipiente.
+- Várias pesagens no mesmo pedido; cada pesagem pode ser editada ou removida.
+- Venda salva peso bruto, tara, peso líquido, preço/kg, custo/kg e valor calculado.
+- Resumo das pesagens na conclusão da venda.
+- Categoria Self-service nos gráficos financeiros.
+- Indicadores de kg vendidos, faturamento self-service e margem quando o custo/kg estiver informado.
+- Tutorial atualizado com a operação por peso.

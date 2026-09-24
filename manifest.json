@@ -1,7 +1,7 @@
 {
   "name": "PDVMix - Vendas e Gestão",
   "short_name": "PDVMix",
-  "description": "PDV e gestão financeira offline para sorveterias, lojas de açaí e lanchonetes.",
+  "description": "PDV e gestão financeira offline para sorveterias, lojas de açaí e lanchonetes, com vendas self-service por peso.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
