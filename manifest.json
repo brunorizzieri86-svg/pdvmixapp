@@ -1,7 +1,7 @@
 {
-  "name": "PDVMix - Gestão para Alimentação",
+  "name": "PDVMix - Vendas e Gestão",
   "short_name": "PDVMix",
-  "description": "Gestão offline com perfis separados para PDV de açaí, sorveteria e lanchonete ou administração de marmitas congeladas.",
+  "description": "Gestão para alimentação com módulos independentes para açaí, sorveteria, lanchonete e marmitas congeladas. Funciona offline.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,10 +9,30 @@
   "background_color": "#F7F5F8",
   "theme_color": "#4B165A",
   "icons": [
-    {"src":"assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
   "id": "./",
-  "display_override": ["standalone","minimal-ui"],
-  "categories": ["business","finance","productivity"]
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "categories": [
+    "business",
+    "finance",
+    "productivity",
+    "food"
+  ],
+  "lang": "pt-BR",
+  "dir": "ltr"
 }

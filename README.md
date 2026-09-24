@@ -1,39 +1,58 @@
-# PDVMix PWA v1.13.1
+# PDVMix PWA v1.14.0
 
-Correção de atualização/cache do GitHub Pages.
+## Atualização automática corrigida
 
-- Mantém os módulos Açaí e Marmitas.
-- `index.html` e navegações passam a priorizar a versão de rede quando online.
-- Service Worker atualizado com `updateViaCache: none`.
-- Incluído `atualizar.html` para limpar Service Worker/cache antigo em caso de emergência.
-- Cache: `pdvmix-v1.13.1`.
+Esta versão NÃO usa página manual `atualizar.html`.
 
-# PDVMix PWA v1.13.0
+O mecanismo foi alterado para o mesmo princípio usado nos outros PWAs estáveis:
 
-## Navegação
-- Barra inferior redesenhada nos dois módulos.
-- 6 acessos fixos por módulo para melhorar leitura no celular.
-- Ajustes permanece no ícone de engrenagem do topo.
-- Item ativo fica elevado para fora da barra, com círculo maior e sombra.
-- Açaí usa roxo/magenta; Marmitas usa verde.
+- Service Worker em estratégia **Network-First**.
+- Ao existir internet, `index.html`, manifesto e arquivos do app são buscados na rede antes do cache.
+- O cache é usado apenas como fallback offline.
+- `skipWaiting()` ativa a versão nova imediatamente.
+- `clients.claim()` faz o novo Service Worker assumir as abas abertas.
+- O `index.html` chama `registration.update()` ao abrir o app.
+- Nova verificação acontece quando a internet volta e quando o app retorna do segundo plano.
+- Quando um Service Worker novo assume o controle, o PDVMix recarrega uma única vez automaticamente.
+- Caches antigos são removidos somente se começarem por `pdvmix-`.
 
-## Tela inicial Marmitas
-- Ações principais do banner reduzidas para **Novo pedido** e **Divulgar**.
-- Agenda e Produção continuam acessíveis pela navegação e acessos rápidos.
+## Módulos confirmados
 
-## Tutoriais
-- Tutorial do módulo Açaí ampliado para cobrir navegação, instalação, produtos, estoque, self-service, combos, PDV, troco, caixa, clientes, fornecedores, compras, despesas, financeiro, gráficos, múltiplos negócios, backup e checklist.
-- Tutorial do módulo Marmitas ampliado para clientes, fornecedores, cadastro e custo de marmitas, produção, estoque disponível, pedidos, descontos, pagamentos, agenda, WhatsApp, PDF, custos, financeiro, múltiplos negócios, backup e checklist.
-- Ambos têm índice e instalação do PWA.
+Na primeira configuração devem aparecer:
 
-## Máscaras e paridade entre módulos
-- Máscara monetária **R$** aplicada a campos financeiros equivalentes dos dois módulos.
-- Máscara de **%** aplicada a taxas, margens e descontos percentuais.
-- Telefone e CPF/CNPJ permanecem formatados.
-- Açaí recebeu a mesma padronização de valores que já vinha sendo aplicada ao módulo Marmitas.
-- Compras, despesas, caixa, produtos, self-service, custos e configurações usam parsers compatíveis com formato brasileiro.
+1. 🍧 **Açaíteria / Sorveteria / Lanchonete**
+2. 🍱 **Marmitas congeladas**
 
-## PWA
-- Offline-first preservado.
-- Cache: `pdvmix-v1.13.0`.
-- Domínio mantido: `pdvmixapp.com.br`.
+A mesma conta também suporta múltiplos negócios/workspaces.
+
+## GitHub Pages
+
+Suba os arquivos DESCOMPACTADOS diretamente na raiz do repositório:
+
+- `index.html`
+- `sw.js`
+- `manifest.json`
+- `CNAME`
+- `.nojekyll`
+- pasta `assets/`
+
+Não é necessário limpar cache manualmente nem abrir URL especial de atualização.
+
+Domínio configurado: `pdvmixapp.com.br`
+
+## Melhorias móveis reaproveitadas do app de referência
+
+- VisualViewport usado apenas em autenticação e modais.
+- Campos continuam acessíveis quando o teclado Android/iPhone abre.
+- O listener não fica recalculando as telas principais durante a rolagem, evitando jank.
+
+
+## v1.14.0
+
+- Tutorial interativo nos dois módulos: abre a tela/cadastro real para aprender fazendo.
+- Preview do logo corrigido e aplicado imediatamente.
+- Fotos de produto sem corte (`object-fit: contain`) e padronização local automática com enquadramento, tentativa de remoção do fundo simples e fundo neutro.
+- Ajustes reorganizados; “Meus negócios e módulos” foi movido para o final e os botões foram alinhados.
+- Botões primários de Marmitas com contraste corrigido.
+- Barra inferior de Marmitas e Açaí revisada para telas estreitas, sem corte dos itens.
+- Mantido PWA offline-first com atualização Network-First.
