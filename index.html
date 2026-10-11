@@ -646,7 +646,7 @@ body.rental-business{--p:#0E7490;--pd:#0B5563;--m:#0891B2;--g:#2F9E58;--gd:#2279
 .rsv-agenda-legend span{display:inline-flex;align-items:center;gap:5px}
 .rsv-agenda-legend i{width:9px;height:9px;border-radius:3px}
 .rsv-day.checkin{box-shadow:inset 3px 0 0 var(--g)}
-.rsv-day.checkout{box-shadow:inset -3px 0 0 var(--o)}
+.rsv-day.checkout{box-shadow:inset -3px 0 0 var(--o)}.rsv-day.hol:after{content:'';position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--info);box-shadow:0 0 0 1.5px #fff}.rsv-holiday-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#EAF2FF;border:1px solid #CFE0FA;color:#2655A3;border-radius:14px;padding:10px 12px;margin:10px 0}.rsv-holiday-banner b{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#2655A3}.rsv-holiday-banner span{font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.03em;color:#4A78B8;white-space:nowrap}
 @media(max-width:360px){.rsv-quick-row{grid-template-columns:repeat(4,1fr);gap:6px}.rsv-quick{font-size:9.5px;padding:10px 2px 8px}.rsv-quick .rq-ic{width:32px;height:32px}}
 
 /* ===== v1.19.0: pendências clicáveis + parcelamento no cartão ===== */
@@ -719,7 +719,7 @@ body.rental-business{--p:#0E7490;--pd:#0B5563;--m:#0891B2;--g:#2F9E58;--gd:#2279
 <div id="modals"></div><div id="toastHost"></div>
 
 <script>
-const APP_VERSION='1.20.0';
+const APP_VERSION='1.21.0';
 const TUTORIAL_VERSION='8';
 const TUT_DONE_KEY='pdvmix_tutorial_done_v'+TUTORIAL_VERSION;
 const TUT_STEP_KEY='pdvmix_tutorial_step_v'+TUTORIAL_VERSION;
@@ -955,13 +955,46 @@ function bookingItemHTML(bk){
 }
 
 // ---- Agenda (calendário mensal de ocupação) ----
+/* ===== Feriados e datas especiais (Brasil / SP / Guarujá) =====
+   Motor de feriados válido para qualquer ano: datas fixas + datas móveis
+   calculadas a partir da Páscoa (algoritmo de Gauss/Meeus). Uso apenas
+   informativo/visual — o PDVMix não altera preços automaticamente. */
+function easterSunday(year){const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*mm+114)/31),day=((h+l-7*mm+114)%31)+1;return new Date(year,month-1,day)}
+function addDaysDate(date,n){const d=new Date(date);d.setDate(d.getDate()+n);return d}
+function ymdFromDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+const HOLIDAY_TYPE_LABEL={nacional:'Feriado nacional',estadual:'Feriado estadual (SP)',municipal:'Feriado municipal (Guarujá)',facultativo:'Ponto facultativo / alta temporada'};
+function holidaysForYear(year){
+  const easter=easterSunday(year);
+  return [
+    {date:`${year}-01-01`,name:'Confraternização Universal (Ano-Novo)',type:'nacional'},
+    {date:ymdFromDate(addDaysDate(easter,-48)),name:'Carnaval (segunda-feira)',type:'facultativo'},
+    {date:ymdFromDate(addDaysDate(easter,-47)),name:'Carnaval (terça-feira)',type:'facultativo'},
+    {date:ymdFromDate(addDaysDate(easter,-2)),name:'Sexta-feira Santa',type:'nacional'},
+    {date:`${year}-04-21`,name:'Tiradentes',type:'nacional'},
+    {date:`${year}-05-01`,name:'Dia do Trabalho',type:'nacional'},
+    {date:ymdFromDate(addDaysDate(easter,60)),name:'Corpus Christi',type:'facultativo'},
+    {date:`${year}-06-30`,name:'Aniversário de Guarujá',type:'municipal'},
+    {date:`${year}-07-09`,name:'Revolução Constitucionalista',type:'estadual'},
+    {date:`${year}-09-07`,name:'Independência do Brasil',type:'nacional'},
+    {date:`${year}-10-12`,name:'Nossa Senhora Aparecida',type:'nacional'},
+    {date:`${year}-11-02`,name:'Finados',type:'nacional'},
+    {date:`${year}-11-15`,name:'Proclamação da República',type:'nacional'},
+    {date:`${year}-11-20`,name:'Consciência Negra',type:'nacional'},
+    {date:`${year}-12-25`,name:'Natal',type:'nacional'},
+    {date:`${year}-12-31`,name:'Véspera de Ano-Novo (Réveillon)',type:'facultativo'}
+  ]
+}
+let _holidayCache={};
+function holidaysForYearCached(year){if(!_holidayCache[year])_holidayCache[year]=holidaysForYear(year);return _holidayCache[year]}
+function holidayOnDay(ds){if(!ds)return null;const year=Number(String(ds).slice(0,4));if(!year)return null;return holidaysForYearCached(year).find(h=>h.date===ds)||null}
 function renderRentalAgenda(){
   const m=window._rsvMonth||monthKey();window._rsvMonth=m;
   if(!window._rsvDay||String(window._rsvDay).slice(0,7)!==m)window._rsvDay=m===monthKey()?today():m+'-01';
   const sel=window._rsvDay,[y,mo]=m.split('-').map(Number),first=new Date(y,mo-1,1),days=new Date(y,mo,0).getDate(),lead=first.getDay(),cells=[];
   for(let i=0;i<lead;i++)cells.push('<div class="rsv-day blank"></div>');
-  for(let d=1;d<=days;d++){const ds=`${m}-${String(d).padStart(2,'0')}`,bs=bookingsOnDay(ds),isToday=ds===today(),isSel=ds===sel;const isIn=bs.some(b=>b.checkin===ds),isOut=(DB.bookings||[]).some(b=>b.status!=='cancelada'&&b.checkout===ds);cells.push(`<button class="rsv-day ${isToday?'today':''} ${isSel?'sel':''} ${bs.length?'has':''} ${isIn?'checkin':''} ${isOut?'checkout':''}" onclick="rsvSelectDay('${ds}')"><b>${d}</b>${bs.length?`<small>${bs.length}</small>`:''}</button>`)}
-  $('screen-agenda').innerHTML=`<div class="subhead"><div><h1>Agenda de reservas</h1><p>Check-ins, check-outs e ocupação do imóvel em um único calendário.</p></div><button class="btn primary sm" onclick="openBooking()">${ic('plus',16)} Nova reserva</button></div><div class="rsv-top"><button class="btn gray sm" onclick="rsvChangeMonth(-1)">‹</button><button class="rsv-month" onclick="rsvToday()">${esc(cap1(mealMonthName(m)))}<small>Toque para voltar a hoje</small></button><button class="btn gray sm" onclick="rsvChangeMonth(1)">›</button></div><div class="rsv-card"><div class="agenda-dow"><span>DOM</span><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span></div><div class="rsv-grid">${cells.join('')}</div></div><div class="rsv-summary"><div><small>Noites ocupadas</small><b>${monthOccupiedNights(m)}</b></div><div><small>Reservas no mês</small><b>${bookingsTouchingMonth(m).length}</b></div><div><small>Ocupação</small><b>${occupancyRate(m)}%</b></div></div><div class="rsv-agenda-legend"><span><i style="background:var(--g)"></i>Check-in</span><span><i style="background:var(--o)"></i>Check-out</span><span><i style="background:var(--danger)"></i>Ocupado</span></div><div class="sec-head"><h2>${dateBR(sel)}</h2><button onclick="openBooking()">Adicionar</button></div>${rsvDayListHTML(sel)}`
+  for(let d=1;d<=days;d++){const ds=`${m}-${String(d).padStart(2,'0')}`,bs=bookingsOnDay(ds),isToday=ds===today(),isSel=ds===sel;const isIn=bs.some(b=>b.checkin===ds),isOut=(DB.bookings||[]).some(b=>b.status!=='cancelada'&&b.checkout===ds),isHol=!!holidayOnDay(ds);cells.push(`<button class="rsv-day ${isToday?'today':''} ${isSel?'sel':''} ${bs.length?'has':''} ${isIn?'checkin':''} ${isOut?'checkout':''} ${isHol?'hol':''}" onclick="rsvSelectDay('${ds}')"><b>${d}</b>${bs.length?`<small>${bs.length}</small>`:''}</button>`)}
+  const selHol=holidayOnDay(sel);
+  $('screen-agenda').innerHTML=`<div class="subhead"><div><h1>Agenda de reservas</h1><p>Check-ins, check-outs e ocupação do imóvel em um único calendário.</p></div><button class="btn primary sm" onclick="openBooking()">${ic('plus',16)} Nova reserva</button></div><div class="rsv-top"><button class="btn gray sm" onclick="rsvChangeMonth(-1)">‹</button><button class="rsv-month" onclick="rsvToday()">${esc(cap1(mealMonthName(m)))}<small>Toque para voltar a hoje</small></button><button class="btn gray sm" onclick="rsvChangeMonth(1)">›</button></div><div class="rsv-card"><div class="agenda-dow"><span>DOM</span><span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SÁB</span></div><div class="rsv-grid">${cells.join('')}</div></div><div class="rsv-summary"><div><small>Noites ocupadas</small><b>${monthOccupiedNights(m)}</b></div><div><small>Reservas no mês</small><b>${bookingsTouchingMonth(m).length}</b></div><div><small>Ocupação</small><b>${occupancyRate(m)}%</b></div></div><div class="rsv-agenda-legend"><span><i style="background:var(--g)"></i>Check-in</span><span><i style="background:var(--o)"></i>Check-out</span><span><i style="background:var(--danger)"></i>Ocupado</span><span><i style="background:var(--info)"></i>Feriado</span></div><div class="sec-head"><h2>${dateBR(sel)}</h2><button onclick="openBooking()">Adicionar</button></div>${selHol?`<div class="rsv-holiday-banner"><b>${ic('calendar',14)} ${esc(selHol.name)}</b><span>${HOLIDAY_TYPE_LABEL[selHol.type]}</span></div>`:''}${rsvDayListHTML(sel)}`
 }
 function rsvDayListHTML(ds){const bs=bookingsOnDay(ds);if(!bs.length)return '<div class="empty"><b>Nenhuma reserva nesse dia</b><span>Toque em Adicionar para criar uma.</span></div>';return `<div class="rsv-list">${bs.map(bookingItemHTML).join('')}</div>`}
 function rsvSelectDay(ds){window._rsvDay=ds;renderRentalAgenda()}
