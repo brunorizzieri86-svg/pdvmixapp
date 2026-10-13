@@ -17,7 +17,43 @@ datas, Agenda com calendário de ocupação, Financeiro (receita, despesas do
 imóvel, a receber/a pagar) e cadastro de Hóspedes (reaproveita a ficha de
 clientes do PDVMix).
 
+## Módulo Cantinho do Açaí — Programa de Fidelidade
+
+Cartão de carimbos por cliente: ao vincular uma venda a um cliente
+cadastrado (botão "Adicionar cliente" na tela de Nova venda, com cadastro
+rápido embutido), o PDVMix soma um carimbo automaticamente — respeitando
+um valor mínimo de compra configurável. O cartão, com o nome do cliente
+impresso (uso pessoal e intransferível), o histórico de carimbos e o
+prêmio configurado, fica disponível a partir da lista de Clientes. Ao
+completar o cartão, a loja marca o prêmio como entregue e um novo cartão
+começa na hora — o cadastro guarda quantos cartões o cliente já completou.
+Clientes perto de completar (conforme o limite configurado) ganham um
+aviso "quase lá" na lista; o lembrete é sempre enviado manualmente pelo
+WhatsApp, com a mensagem pronta mas totalmente editável antes do envio.
+Configurações (carimbos para completar, valor mínimo, prêmio, limite do
+aviso e modelo da mensagem) ficam em Ajustes → Fidelidade. Recurso
+exclusivo do modo Açaí/Sorveteria — não afeta Marmitas nem Temporada.
+
 ## Histórico de versões
+
+### v1.22.0 — Programa de Fidelidade (Cantinho do Açaí)
+- Botão "Adicionar cliente" na tela de Nova venda, com busca de clientes
+  já cadastrados e cadastro rápido (nome + WhatsApp) sem sair do checkout.
+- Carimbo automático a cada venda vinculada a um cliente, respeitando um
+  valor mínimo de compra configurável (padrão: qualquer valor).
+- Cartão de fidelidade por cliente (acessível pela lista de Clientes),
+  com o nome do cliente impresso no próprio cartão ("uso pessoal e
+  intransferível"), histórico de carimbos e prêmio configurado.
+- Ao completar o cartão, a loja marca "prêmio entregue" e um novo cartão
+  começa na hora; o cadastro guarda quantos cartões já foram completados
+  e a data do último resgate.
+- Aviso "quase lá" na lista de Clientes quando faltam poucos carimbos
+  (limite configurável) — o envio pelo WhatsApp continua manual, com
+  mensagem pronta e editável antes de confirmar.
+- Configurações do programa (carimbos para completar, valor mínimo,
+  prêmio, limite do aviso, modelo da mensagem) em Ajustes → Fidelidade.
+- Recurso exclusivo do modo Açaí/Sorveteria — Marmitas e Temporada não
+  são afetados.
 
 ### v1.21.0 — Feriados e datas especiais na Agenda
 - Motor de feriados válido para qualquer ano: datas fixas + datas móveis
@@ -63,8 +99,12 @@ clientes do PDVMix).
 ## Publicação (GitHub Pages)
 
 1. Suba os arquivos deste pacote (`index.html`, `sw.js`, `manifest.json`,
-   `README.md`, `.nojekyll` e, se aplicável, `CNAME`) para a raiz do
-   repositório/branch publicado pelo GitHub Pages.
+   `README.md`, `.nojekyll`, a pasta `assets/` — que a partir da v1.22.0
+   inclui também `acai-logo.png`, usado no cartão de fidelidade — e, se
+   aplicável, `CNAME`) para a raiz do repositório/branch publicado pelo
+   GitHub Pages. Os demais arquivos que já estavam na pasta `assets/` do
+   site publicado (ícones, logo padrão do PDVMix) continuam no lugar;
+   este pacote só acrescenta o novo arquivo do logo do açaí.
 2. O `.nojekyll` evita que o GitHub Pages tente processar o site com Jekyll
    (necessário porque o projeto usa pastas começando com `_`/arquivos que o
    Jekyll ignoraria por padrão).
