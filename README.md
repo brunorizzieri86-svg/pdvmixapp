@@ -36,6 +36,27 @@ exclusivo do modo Açaí/Sorveteria — não afeta Marmitas nem Temporada.
 
 ## Histórico de versões
 
+### v1.22.2 — Correção definitiva do travamento de tela com teclado
+- A v1.22.1 corrigiu uma causa parcial do bug "tela desce e não sobe" ao
+  editar campos (como o WhatsApp do cliente) com o teclado aberto, mas o
+  problema continuou acontecendo nos testes reais do usuário. Investigando
+  mais a fundo, foi encontrada a causa raiz de verdade: o app já tinha um
+  mecanismo para o cartão/formulário (o painel que desliza de baixo em
+  qualquer tela) encolher e caber acima do teclado, mas esse mecanismo só
+  estava aplicado ao fundo escurecido do modal — o cartão em si ainda podia
+  ficar mais alto do que o espaço realmente visível, e a parte de cima dele
+  (geralmente onde ficam os primeiros campos do formulário) era empurrada
+  para fora da tela, sem como rolar até ela.
+- Corrigido: agora o cartão/formulário também respeita o espaço disponível
+  acima do teclado, igual ao fundo do modal. Como a correção é no
+  componente compartilhado por todos os formulários do app, ela vale para
+  qualquer tela com modal (cliente, produto, venda, ajustes etc.), não só
+  a de cliente.
+- Observação: como não existe teclado virtual real de celular dentro do
+  ambiente onde o app é desenvolvido e testado automaticamente, a
+  verificação final de que o problema não volta mais depende do teste no
+  aparelho do usuário.
+
 ### v1.22.1 — Correções no Programa de Fidelidade
 - Corrigido: os carimbos das últimas colunas do Cartão Fidelidade (o "5"
   e o "10", por exemplo) apareciam cortados na lateral do card, e os

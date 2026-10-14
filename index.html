@@ -370,6 +370,9 @@ body.meal-business nav button.on>span:last-child{color:#35572B}
   bottom:auto;
   height:var(--pdv-visual-height,100dvh);
 }
+.sheet{
+  max-height:calc(var(--pdv-visual-height,100dvh) - 6px);
+}
 
 
 /* ===== v1.14.0 — tutorial interativo, imagens padronizadas, ajustes e navegação ===== */
@@ -765,7 +768,7 @@ body.rental-business{--p:#0E7490;--pd:#0B5563;--m:#0891B2;--g:#2F9E58;--gd:#2279
 <div id="modals"></div><div id="toastHost"></div>
 
 <script>
-const APP_VERSION='1.22.1';
+const APP_VERSION='1.22.2';
 const TUTORIAL_VERSION='8';
 const TUT_DONE_KEY='pdvmix_tutorial_done_v'+TUTORIAL_VERSION;
 const TUT_STEP_KEY='pdvmix_tutorial_step_v'+TUTORIAL_VERSION;
