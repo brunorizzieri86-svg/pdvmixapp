@@ -36,6 +36,19 @@ exclusivo do modo Açaí/Sorveteria — não afeta Marmitas nem Temporada.
 
 ## Histórico de versões
 
+### v1.22.1 — Correções no Programa de Fidelidade
+- Corrigido: os carimbos das últimas colunas do Cartão Fidelidade (o "5"
+  e o "10", por exemplo) apareciam cortados na lateral do card, e os
+  círculos saíam ovalados em vez de redondos — a grade de carimbos agora
+  sempre cabe na largura do cartão e fica perfeitamente circular,
+  inclusive em cartões configurados com mais de 10 carimbos.
+- Corrigido: em telas estreitas, ao focar um campo dentro de qualquer
+  modal/formulário (como "Editar cliente") com o teclado aberto, a tela
+  podia rolar sozinha para baixo e "travar" perto do rodapé, dificultando
+  voltar para campos como WhatsApp/telefone. O ajuste automático de rolagem
+  ao focar um campo agora é ignorado dentro de modais, que já têm seu
+  próprio mecanismo de acompanhar o teclado.
+
 ### v1.22.0 — Programa de Fidelidade (Cantinho do Açaí)
 - Botão "Adicionar cliente" na tela de Nova venda, com busca de clientes
   já cadastrados e cadastro rápido (nome + WhatsApp) sem sair do checkout.
