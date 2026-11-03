@@ -1,9 +1,9 @@
-// PDVMix — Service Worker v1.23.1
+// PDVMix — Service Worker v1.23.2
 // Estratégia: Network-First.
 // Online: busca sempre a versão publicada no GitHub Pages.
 // Offline: usa a última versão válida armazenada em cache.
 
-const CACHE = 'pdvmix-v1.23.1';
+const CACHE = 'pdvmix-v1.23.2';
 
 const CORE_FILES = [
   './index.html',
