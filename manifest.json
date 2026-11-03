@@ -1,7 +1,7 @@
 {
   "name": "PDVMix - Vendas e Gestão",
   "short_name": "PDVMix",
-  "description": "Gestão para alimentação com módulos independentes para açaí, sorveteria, lanchonete e marmitas congeladas. Funciona offline.",
+  "description": "Gestão para pequenos negócios com módulos independentes: açaí/sorveteria, marmitas congeladas, temporada e FreteMix (cálculo de fretes).",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
