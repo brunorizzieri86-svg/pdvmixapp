@@ -2,12 +2,33 @@
 
 PWA (Progressive Web App) offline-first para gestão de pequenos negócios, com módulos
 independentes dentro da mesma conta: **Açaí/Sorveteria**, **Marmitas congeladas**,
-**Temporada** (locação por temporada — módulo "Apê Guarujá") e **FreteMix** (cálculo de fretes).
+**Temporada** (locação por temporada — módulo "Apê Guarujá") **FreteMix** (cálculo de fretes) e **Investimentos**.
 
 Tudo roda em um único arquivo `index.html` (HTML + CSS + JS inline), com persistência local
 criptografada (localStorage + IndexedDB) e funcionamento offline via Service Worker (`sw.js`,
 estratégia network-first). O FreteMix é a exceção de conectividade: precisa de internet para
 consultar rotas.
+
+## Módulo Investimentos
+
+Quinto tipo de negócio, com cinco abas:
+
+- **Início** — patrimônio da carteira, índices do dia (Selic, CDI, IPCA 12m, juro real), ranking
+  "quanto rende R$ X em 12 meses" e leitura do mercado.
+- **Simular** — valor inicial, aporte mensal, prazo e cenário de juros (atuais, queda de 2 p.p.,
+  alta de 1 p.p. ou expectativa Focus). Compara Tesouro Selic, CDB, LCI/LCA, Tesouro IPCA+,
+  Tesouro Prefixado, FIIs, ações e poupança, líquido de IR (tabela regressiva calculada aporte a
+  aporte) e custódia B3; retorno em 1, 6 e 12 meses e no prazo, gráfico e "quanto aportar para
+  chegar a R$ X".
+- **Estratégia** — distribuição por perfil, objetivo, prazo e reserva de emergência, ajustada pela
+  leitura do mercado (juro real, inflação vs. meta, Focus). Registra os aportes na carteira.
+- **Carteira** — aportes e valor estimado hoje (líquido de IR).
+- **Mercado** — índices, botão Atualizar, edição manual de índices e taxas dos produtos.
+
+**Atualização:** Selic, CDI, IPCA e Focus vêm da API pública do Banco Central (SGS 432, 4389,
+13522, 433 e Olinda), ao abrir o app (dados com mais de 6 h) e ao voltar ao primeiro plano.
+Offline, usa os últimos valores salvos. As taxas dos produtos são referências **editáveis**.
+Conteúdo educativo; não é recomendação de investimento. Dados em `DB.invest`.
 
 ## Módulo FreteMix (cálculo de fretes)
 
@@ -72,6 +93,23 @@ aviso e modelo da mensagem) ficam em Ajustes → Fidelidade. Recurso
 exclusivo do modo Açaí/Sorveteria — não afeta Marmitas nem Temporada.
 
 ## Histórico de versões
+
+### v1.24.0 — Novo módulo Investimentos
+- Simulador, estratégia de carteira, carteira e mercado, com taxas atualizadas pelo Banco Central.
+- Não altera Açaí, Marmitas, Temporada nem FreteMix.
+
+### v1.23.4 — Diagnóstico do aparelho + iPhone sem desfoque
+- Novo **Diagnóstico do aparelho** (Ajustes e também na tela de login, sem precisar entrar): mostra aparelho e navegador, se está no app instalado ou numa aba, tamanho do banco e onde está gravado, espaço disponível, armazenamento persistente, última gravação, pontos de segurança e último backup. Botão **Testar** (grava e lê no IndexedDB, no localStorage e testa a criptografia) e botões **Copiar** e **WhatsApp** para enviar o relatório.
+- No iPhone/iPad, a barra de cima e o menu de baixo deixam de usar `backdrop-filter` (desfoque), que pode piscar ao rolar. O visual não muda, pois o fundo já era quase opaco.
+
+### v1.23.3 — Acesso: ver senha, erros claros e trazer backup na tela inicial
+- Botão de **olho** (mostrar/ocultar senha) no login e na criação do acesso. Os campos de e-mail e senha não capitalizam nem autocorrigem no iPhone.
+- Mensagens de erro específicas: "Senha incorreta" ou "Este e-mail não é o cadastrado aqui (ju***@…)". Na 2ª falha seguida abre a ajuda "Não consegue entrar?".
+- Tela inicial (sem acesso criado) ganhou **"Já uso o PDVMix — trazer meus dados de um backup"**: carrega o arquivo de backup, cria o novo e-mail e senha e restaura tudo de uma vez. Útil porque o app instalado na tela inicial do iPhone guarda dados separados do Safari e nasce vazio.
+
+### v1.23.2 — Lançar vendas de dias anteriores
+- Nova opção em **Ajustes › Lançar dias anteriores** (desligada por padrão). Ligada, a **Nova venda** ganha o campo **Data da venda** (Hoje / Ontem / 2 dias atrás / calendário).
+- A venda grava a data escolhida, baixa o estoque, soma carimbo de fidelidade e aparece nos relatórios do dia escolhido. **Não** entra no caixa aberto hoje. Data futura não é aceita. Um aviso amarelo mostra que a venda é de outro dia.
 
 ### v1.23.1 — Correção: "armazenamento cheio" ao salvar (iPhone)
 - O banco principal passou do `localStorage` (limite de ~5 MB no Safari/iOS, independente do espaço livre do aparelho) para o **IndexedDB**, que usa o espaço livre real.

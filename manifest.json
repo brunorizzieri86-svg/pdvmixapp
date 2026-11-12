@@ -1,7 +1,7 @@
 {
   "name": "PDVMix - Vendas e Gestão",
   "short_name": "PDVMix",
-  "description": "Gestão para pequenos negócios com módulos independentes: açaí/sorveteria, marmitas congeladas, temporada e FreteMix (cálculo de fretes).",
+  "description": "Gestão para pequenos negócios com módulos independentes: açaí/sorveteria, marmitas congeladas, temporada, FreteMix (cálculo de fretes) e investimentos.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
